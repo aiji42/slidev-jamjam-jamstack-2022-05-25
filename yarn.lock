@@ -92,7 +92,7 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
-"@slidev/cli@^0.31.4":
+"@slidev/cli@^0.31.2", "@slidev/cli@^0.31.4":
   version "0.31.4"
   resolved "https://registry.yarnpkg.com/@slidev/cli/-/cli-0.31.4.tgz#a25f2ea3fa29c6573a2ac69ae650317861a0c181"
   integrity sha512-CwR2eKZzBWJmffE+8aGnHnIyu0hN3NUoNoCew4+cPTavZmli8Y384BMU3MxzAM03xPi+WEnwwNRQeE7a1tpchQ==
@@ -180,7 +180,7 @@
     "@slidev/types" "0.31.4"
     js-yaml "^4.1.0"
 
-"@slidev/theme-default@*":
+"@slidev/theme-default@*", "@slidev/theme-default@^0.21.2":
   version "0.21.2"
   resolved "https://registry.yarnpkg.com/@slidev/theme-default/-/theme-default-0.21.2.tgz#28db9f074cd0b17d19ca6ccd1d4c75db7a24b026"
   integrity sha512-neUucFs2YrRZZd73QwvLTyRG/o1nerDFUR5t8YAmXVLTMzWfY71flQ6aAhjYf+WjsozYsOHcxi/pZtIzZ4VhTQ==
@@ -2020,6 +2020,14 @@ sisteransi@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
+
+slidev-theme-unicorn@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/slidev-theme-unicorn/-/slidev-theme-unicorn-1.1.0.tgz#ce48b17b0625fcf111cb089d2c4ca3fb6526bac7"
+  integrity sha512-d902mcdjgPwnZb06PfRVHY9+yfqR9Q7YlYvYD9vk6ylqTN4EpT6t8jSFYRY99/3UN40n+iYT0lxC9Gb1Zy/kYQ==
+  dependencies:
+    "@slidev/cli" "^0.31.2"
+    "@slidev/theme-default" "^0.21.2"
 
 source-map-js@^1.0.2:
   version "1.0.2"

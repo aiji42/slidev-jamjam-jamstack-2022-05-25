@@ -1,0 +1,11 @@
+header {
+    width: 30px;
+}
+li {
+    font-size: x-large;
+    font-weight: bold;
+}
+li li {
+    font-size: large;
+    font-weight: initial;
+}
