@@ -126,7 +126,35 @@ logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 <div class="flex space-x-4">
 <div class="flex-1">
 
-```text {8,9}
+```text
+app/
+├── routes/
+│   ├── blog/
+│   │   ├── $postId.tsx
+│   │   ├── categories.tsx
+│   │   ├── index.tsx
+│   └── about.tsx
+│   └── blog.tsx
+│   └── index.tsx
+└── root.tsx
+```
+
+</div>
+
+<div class="flex-1">
+
+ディレクトリ構成やファイル名がそのままURLになるという点は、Next.jsのpagesとよく似ている
+
+</div>
+</div>
+
+---
+
+
+<div class="flex space-x-4">
+<div class="flex-1">
+
+```text {7,9}
 app/
 ├── routes/
 │   ├── blog/
@@ -293,6 +321,10 @@ Catch all route (*)
 
 ---
 
+## ドキュメントで紹介されている例
+
+<br>
+
 <div class="flex space-x-4">
 <div class="flex-1">
 
@@ -312,6 +344,10 @@ app/
 <div class="flex-1">
 
 ![](/nested-route-0.png)
+
+https://example.com/sales/invices/102000
+
+こんな感じのダッシュボード
 
 </div>
 </div>
@@ -346,7 +382,10 @@ export default function Root() {
 
 <div class="flex-1">
 
-![](/nested-route-0.png)
+![](/nested-route-1.png)
+
+Outletコンポネント部分がレンダリング時に  
+子レイアウト・子ページになる
 
 </div>
 </div>
@@ -383,7 +422,7 @@ export default function Sales() {
 
 <div class="flex-1">
 
-![](/nested-route-0.png)
+![](/nested-route-2.png)
 
 </div>
 </div>
@@ -427,7 +466,9 @@ export default function InvoiceList() {
 
 <div class="flex-1">
 
-![](/nested-route-0.png)
+![](/nested-route-3.png)
+
+layoutにもloaderを設置可能
 
 </div>
 </div>
@@ -459,13 +500,68 @@ export default function Invoice() {
     <InvoiceItem data={data} />
   )
 }
+
+export function ErrorBoundary({ error }) {
+  return (
+    <ErrorMessage>{error.message}</ErrorMessage>
+  )
+}
 ```
 
 </div>
 
 <div class="flex-1">
 
-![](/nested-route-0.png)
+![](/nested-route-4.png)
+
+各ページ・レイアウトにごとにErrorBoundaryを定義可能
+
+</div>
+</div>
+
+---
+
+<div class="flex space-x-4">
+<div class="flex-1">
+
+```text {5}
+app/
+├── routes/
+│   ├── sales/
+│   │   ├── invoices/
+│   │   │    └── $id.tsx
+│   │   ├── invoices.tsx
+│   └── sales.tsx
+└── root.tsx
+```
+
+```tsx
+export const loader = async () => {
+  const data = await fetch(...).then((res) => res.json())
+  return { data }
+}
+export default function Invoice() {
+  const { data } = useLoaderData()
+  return (
+    <InvoiceItem data={data} />
+  )
+}
+
+export function ErrorBoundary({ error }) {
+  return (
+    <ErrorMessage>{error.message}</ErrorMessage>
+  )
+}
+```
+
+</div>
+
+<div class="flex-1">
+
+![](/nested-route-error.png)
+
+エラーの伝搬をその範囲に留めることができるため、  
+フォールバックが最小限になる
 
 </div>
 </div>
@@ -474,15 +570,25 @@ export default function Invoice() {
 
 ## Nested Routeがあると何が嬉しいか
 
-- レイアウト
-  - これまで説明したとおり
-  - Next.jsみたいに_app.tsxを肥大化させなくて済む
-- 共通処理
+- 共通レイアウト
+- ロジックの分散と共通化 
+  - 分散により並列でデータフェッチ可能になり、高速化につながる
   - 特定ルート配下はログイン必須にするとか
   - __authed/ 配下にログイン必須ページを閉じ込めて __authed.tsx で認証チェック
     - (ダブルアンスコで始めているので、URLには現れない)
 - ナビゲーション時に差分だけロードされる
   - /sales/invoices/1 から /sales/invoices/2 へ遷移する時、$id.tsxのloaderの再フェッチだけで済む
+
+---
+
+## ちょうど先日Next.jsにも同等な機能のRFCが公開された
+
+![](/nextjs-rfc.png)
+https://nextjs.org/blog/layouts-rfc
+
+- 現段階ではおおよそRemixと同等の機能を揃えている
+  - pathless と ErrorBoundaryに関しては言及なし
+  - デフォルトでServerComponentになる (Remixでも同様に議論は起きている)
 
 ---
 logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
