@@ -578,6 +578,7 @@ export function ErrorBoundary({ error }) {
     - (ダブルアンスコで始めているので、URLには現れない)
 - ナビゲーション時に差分だけロードされる
   - /sales/invoices/1 から /sales/invoices/2 へ遷移する時、$id.tsxのloaderの再フェッチだけで済む
+  - 上記のような再フェッチを自動的に実行してくれる
 
 ---
 
@@ -587,46 +588,134 @@ export function ErrorBoundary({ error }) {
 https://nextjs.org/blog/layouts-rfc
 
 - 現段階ではおおよそRemixと同等の機能を揃えている
-  - pathless と ErrorBoundaryに関しては言及なし
+  - pathlessやErrorBoundaryに関しても、「次の発表を待て」とのこと
+    - かなりRemixのノウハウが意思決定に影響を及ぼしている印象
   - デフォルトでServerComponentになる (Remixでも同様に議論は起きている)
 
 ---
 logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
+layout: cover-logos
+logos: [
+'https://cdn.worldvectorlogo.com/logos/cloudflare-1.svg',
+'https://cdn.worldvectorlogo.com/logos/express-109.svg',
+'https://cdn.worldvectorlogo.com/logos/deno-1.svg',
+'https://cdn.worldvectorlogo.com/logos/nodejs.svg',
+'https://cdn.worldvectorlogo.com/logos/cloudflare-pages-single.svg',
+'https://cdn.worldvectorlogo.com/logos/netlify.svg',
+'https://cdn.worldvectorlogo.com/logos/vercel.svg',
+'https://seeklogo.com/images/F/fly-io-logo-BD23E4EA17-seeklogo.com.png'
+]
 ---
 
 #### Remixの特徴 ③
 <br>
 
-# ErrorBoundary
+# マルチランタイム
+
+<style>
+li {
+ font-size: medium;
+}
+</style>
+
+- Node / web worker / Deno
+- Vercel / Netlify / Cloudflare Workers・Pages, etc
+  - セルフホストも標準サポート
+- Next.jsとVervelみたいな関係性のものはない
 
 ---
 logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 ---
+
+<div class="flex space-x-4">
+<div class="flex-1">
+<br>
+
 
 #### Remixの特徴 ④
 <br>
 
-# マルチプラットフォーム
+# Formとヘルパー
 
-Next.jsみたいにVercelに依存しない
-しかし単純比較はできない
+前述のactionと通信を行うための、Formコンポネントや多数のヘルパーを備えている
+
+特に **useTransition** はフォームのsubmitの状態(待機・サブミット・ロード)を管理したり、サブミット中のデータを取り扱うことが可能。
+
+これにより楽観的UIの構築も用意になる。
+
+</div>
+<div class="flex-1">
+<video controls autoplay>
+  <source src="https://remix.run/jokes-tutorial/img/optimistic-ui.mp4" type="video/mp4">
+</video>
+</div>
+</div>
+
+---
+
+remix-validated-form
+
+---
+logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
+---
+
+#### Remixの特徴 ⑤
+
+# Cookieヘルパー
+
+CookieやSessionを取り扱うためのヘルパーが標準装備
+
+```ts
+import { createCookieSessionStorage } from "@remix-run/node"; // or "@remix-run/cloudflare"
+
+const { getSession, commitSession, destroySession } =
+  createCookieSessionStorage({
+    // a Cookie from `createCookie` or the CookieOptions to create one
+    cookie: {
+      name: "__session",
+
+      // all of these are optional
+      domain: "remix.run",
+      expires: new Date(Date.now() + 60_000),
+      httpOnly: true,
+      maxAge: 60,
+      path: "/",
+      sameSite: "lax",
+      secrets: ["s3cret1"],
+      secure: true,
+    },
+  });
+
+export { getSession, commitSession, destroySession };
+```
+
+loader/actionと組み合わせることでステート管理をサーバ側へ移譲することができる。
+
+ロジックがフロントに露出しないため、バンドルサイズも削減できる。
+
+例えば Supabase と組み合わせれば、クライアント側に認証ロジックやデータを一切持たないということも可能。
+
+---
+
+remix-auth
 
 ---
 logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 ---
 
 # 使ってみて良かったところ
-- ステート管理ライブラリが基本的には不要
-  - loader/actionがページではなくコンポネントに対して定義できる
-  - cookieを取り扱うためのヘルパーが用意されている
-  - 楽観的UIや、loader/actionとのfetcher、通信状態を管理するヘルパーが用意されている
-  - クライアントで管理していたステートをサーバサイドへ移譲できる
-    - RailsやPHP系のフレームワークに精通している人はとっつきやすいはず
+
+- ステート管理ライブラリが不要になりクライアントコードが小さくなる
+  - さらにきめ細かく再フェッチできるので、低コストで情報更新できる
 
 ---
 
 # 使ってみて良かったところ
-- エッジワーカー
+- エッジレンダリングはたしかに早い
+  - KV使わなくても、200-300msで応答できる
+  - KV使えば100ms切る
+  - 同一構成の Next.js on Vercel のSSRで300-500ms
+  - (もちろんデータソースに起因する)
 
 ---
 
@@ -640,43 +729,40 @@ logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 
 ---
 
+
+# 使ってみて悪かったところ(苦しかったところ)
+
+- Github上のレスポンスやPR解決までのライフサイクルが長い
+  - 私がRemixのメンバーに言われた名言(皮肉)
+    - 「PRを起票するにはそれなりの根気強さと我慢が必要です」
+    - 「おすすめはできないけど、実際は patch-package が一番の解決策です」
+  - 一緒にリポジトリを育てるという気概が必要
+
+---
+
 # 使ってみて悪かったところ(苦しかったところ)
 
 Workersに限った話になるが
   
 - UIライブラリ入れると1MBにバンドルサイズを抑えるのは結構きつい
-  - SSRするのでUI系のライブラリもバンドルしないといけない
-  - Cloudflare Workersにはバンドルサイズを1MB以下の制限がある
-    - 申請すれば一応拡張可能ではあるのが、コールドスタートのレイテンシに影響する
-  - Service Bindingを駆使して回避した
-- Nodeではないので、動かないWorker非対応なライブラリは軒並み動かない
+  - SSRなので全てバンドルしないといけない(チャンクできない)
+  - Service Bindingsを駆使して回避した
+- まだまだWorker非対応なライブラリが多い
   - esbuildでpolyfillしたり、injectしたりなど職人芸が求められる
   - しかし、そもそもesbuildの拡張が不可能
     - 何度もDiscussionに起票されているが、コミュニティのポリシー的にNG
-  - なので、自分でRemixのesbuild を拡張可能にするライブラリを書いた
+  - 自分でRemixのesbuild を拡張可能にするライブラリを書いた
 
----
+<br>
 
-# 使ってみて悪かったところ(苦しかったところ)
+**初心者の方はランタイムNodeからスタートすることをオススメします**
 
-Workersに限った話になるが
-
-- Edgeでレンダリングできるので早いとはいえ。。。
-  - 結局データソースに起因する
-    - DBのリージョンとか、同時接続数とか
-  - KVとかDOとかCache APIをうまく駆使しなければならない
-  - 今後D1が出てくればブレイクスルーしそう
-
-## でもやっぱり、エッジでレンダリングできるのは夢がある
-
----
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 ---
 
 # 向いているサービスやサイト
 
 - React Routeで構築されたSPAサイトをSSRに移行したい、SEO対策したい
-  - React Routeの思想をベースに構築されている
+  - React Routeの思想をベースに構築されているため、大きく構造を変えずに移行できる
 - 複数ページに渡るエントリーフォームを実装したい
   - 後述のremix-validate-formを導入するとサーバ - クライアント間でバリデーションを共有できる
   - 状態管理をloader/actionに任せられるので、ステートライブラリを入れなくてもよい
