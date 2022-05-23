@@ -773,11 +773,6 @@ Workersに限った話になるが
 logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 ---
 
-# remix-validate-form
+# Next.jsにもなにかエッセンス取り入れられませんか？
 
----
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
----
-
-# remix-auth
-
+next-runtime
