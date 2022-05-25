@@ -5,7 +5,10 @@ lineNumbers: false
 layout: center
 ---
 
-# Remixを導入してみた
+<div class="text-center text-5xl pb-8">📀</div>
+
+## パブリックから半年
+# Remix使い倒してみた
 
 ## @aiji42_dev
 
@@ -36,17 +39,14 @@ image: 'https://remix.run/remix-v1.jpg'
 # 今日はRemixを紹介したい
 
 ---
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
----
 
 # What is Remix ?
 
 - React SSRフレームワーク
 - React Routerの開発チームが開発を主導
 - 昨年11月末にv1がリリースされたタイミングでパブリックに
+- 📀 のアイコンがよく使われる
 
----
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 ---
 
 #### Remixの特徴 ①
@@ -96,29 +96,33 @@ export default Page
 
 # loaderとaction
 
-Next.js の getServerSideProps や API Routes と同じようなもの。
+#### Next.js の getServerSideProps や API Routes のようなもの
 
-loaderでGETアクセス時のデータフェッチを定義し、actionでPOSTやDELETEなどのミューテーションを定義する。
+<br>
 
-ページからは useLoaderData でloaderデータを獲得する。
+ページコンポネントと同一ファイルに定義可能
 
-ページ(を構成するパーシャル)と同一ファイルに書くことができる。  
-<small>※ Next.jsでもgetServerSidePropsでGET以外のリクエストを受けることができるが、拡張が必要であり、API Routesで受けるのが一般的</small>
+<br>
+
+##### loader
+GETアクセス時のデータフェッチを定義  
+ページ(コンポネント)からは**useLoaderData**で取得し、**useFetcher**で再フェッチ可能
+
+##### action
+POSTやDELETEなどのミューテーションを定義する
+**useSubmit**や**useFormAction**、form要素からリクエストする
 
 </div>
 </div>
 
----
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 ---
 
 #### Remixの特徴 ②
 <br>
 
-# File system routing と Nested Routing
+# File system routing と Nested Routing (Layout)
 
-レイアウトルート
-共通処理
+レイアウトルート / 共通処理
 
 ---
 
@@ -149,7 +153,6 @@ app/
 </div>
 
 ---
-
 
 <div class="flex space-x-4">
 <div class="flex-1">
@@ -203,6 +206,11 @@ app/
 
 <div class="flex-1">
 
+ディレクトリの入れ子はそのままURLに変換される
+
+$(ドルマーク)をつけると、  
+パラメータとしてloader/actionで扱える
+
 
 | URL              | Matched Route                  |
 |------------------|--------------------------------|
@@ -236,6 +244,8 @@ app/
 
 <div class="flex-1">
 
+root.tsxがトップレイヤレイアウト  
+ディレクトリと同一名ファイルが子レイアウト
 
 | URL              | Matched Route                  | Layout               |
 |------------------|--------------------------------|----------------------|
@@ -270,7 +280,8 @@ app/
 <div class="flex-1">
 
 ダブルアンダースコアで始めると  
-URL化されないレイアウトルートになる
+URL化されないレイアウトルートになる  
+(pathless layout routes)
 
 </div>
 </div>
@@ -384,6 +395,8 @@ export default function Root() {
 
 ![](/nested-route-1.png)
 
+root.tsxがトップレイヤレイアウト
+
 Outletコンポネント部分がレンダリング時に  
 子レイアウト・子ページになる
 
@@ -423,6 +436,8 @@ export default function Sales() {
 <div class="flex-1">
 
 ![](/nested-route-2.png)
+
+ディレクトリと同一名ファイルで子レイアウトを定義
 
 </div>
 </div>
@@ -490,10 +505,11 @@ app/
 ```
 
 ```tsx
-export const loader = async () => {
-  const data = await fetch(...).then((res) => res.json())
+export const loader = async ({ params }) => {
+  const data = await db.invoice.findOne({ where: { id: params.id } })
   return { data }
 }
+
 export default function Invoice() {
   const { data } = useLoaderData()
   return (
@@ -514,7 +530,8 @@ export function ErrorBoundary({ error }) {
 
 ![](/nested-route-4.png)
 
-各ページ・レイアウトにごとにErrorBoundaryを定義可能
+各ページ・レイアウトにごとに  
+ErrorBoundaryを定義可能
 
 </div>
 </div>
@@ -536,10 +553,11 @@ app/
 ```
 
 ```tsx
-export const loader = async () => {
-  const data = await fetch(...).then((res) => res.json())
+export const loader = async ({ params }) => {
+  const data = await db.invoice.findOne({ where: { id: params.id } })
   return { data }
 }
+
 export default function Invoice() {
   const { data } = useLoaderData()
   return (
@@ -560,7 +578,7 @@ export function ErrorBoundary({ error }) {
 
 ![](/nested-route-error.png)
 
-エラーの伝搬をその範囲に留めることができるため、  
+エラーの伝搬を留めることができる    
 フォールバックが最小限になる
 
 </div>
@@ -568,17 +586,23 @@ export function ErrorBoundary({ error }) {
 
 ---
 
-## Nested Routeがあると何が嬉しいか
+## Nested Routes があると何が嬉しいか
 
-- 共通レイアウト
-- ロジックの分散と共通化 
-  - 分散により並列でデータフェッチ可能になり、高速化につながる
-  - 特定ルート配下はログイン必須にするとか
-  - __authed/ 配下にログイン必須ページを閉じ込めて __authed.tsx で認証チェック
-    - (ダブルアンスコで始めているので、URLには現れない)
-- ナビゲーション時に差分だけロードされる
-  - /sales/invoices/1 から /sales/invoices/2 へ遷移する時、$id.tsxのloaderの再フェッチだけで済む
-  - 上記のような再フェッチを自動的に実行してくれる
+- レイアウトのグルーピングと階層適応
+
+- 並列データフェッチ
+  - 各loaderは並列に処理されるため、高速化につながる
+  - <img src="/fetch.png" class="h-80" />
+
+---
+
+- ロジックの共通化 
+  - 特定ルート配下はログイン必須にするなどの、共通処理を階層的にもたせられる
+  - pathless routesと組み合わせて特定のディレクトリ下は暗黙的に認証必須にするなど
+ 
+- 差分ロード・差分再フェッチ
+  - ナビゲーション時にフルページロードではなく、必要なレイアウトルート分のロードが行われる
+  - 任意にページ内を更新する再フェッチ処理も実装しやすい
 
 ---
 
@@ -587,13 +611,12 @@ export function ErrorBoundary({ error }) {
 ![](/nextjs-rfc.png)
 https://nextjs.org/blog/layouts-rfc
 
-- 現段階ではおおよそRemixと同等の機能を揃えている
-  - pathlessやErrorBoundaryに関しても、「次の発表を待て」とのこと
+- 現プロポーザルではおおよそRemixと同等の機能をカバーする予定
+  - pathlessやErrorBoundaryに関しても、ドキュメントにはないが「パート2で言及する」とのこと
     - かなりRemixのノウハウが意思決定に影響を及ぼしている印象
   - デフォルトでServerComponentになる (Remixでも同様に議論は起きている)
 
 ---
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 layout: cover-logos
 logos: [
 'https://cdn.worldvectorlogo.com/logos/cloudflare-1.svg',
@@ -620,28 +643,51 @@ li {
 
 - Node / web worker / Deno
 - Vercel / Netlify / Cloudflare Workers・Pages, etc
-  - セルフホストも標準サポート
-- Next.jsとVervelみたいな関係性のものはない
+- もちろんセルフホスト可能
 
 ---
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
+
+<style>
+p {
+  font-size: large;
+}
+</style>
+
+プラットフォームに依存しないという点で、Next.jsとVercelの関係と比較される事が多い
+
+ただし、RemixはSSRだけしかサポートしていないので単純比較は正直フェアではない  
+(Next.jsもSSRだけならプラットフォームには依存しないので)
+
+<br>
+
+## Remixの一番の強みは Cloudflare Workers 上で動くという点
+
+だと個人的には思う。
+
+低コスト・例レイテンシでリアルタイムにコンテンツをデリバリできるのが強み
+
+<br>
+
+**裏を返せば静的なページをデリバリするのであれば Remix は向いていない**
+
 ---
 
 <div class="flex space-x-4">
 <div class="flex-1">
 <br>
 
-
 #### Remixの特徴 ④
 <br>
 
 # Formとヘルパー
 
+<br>
+
 前述のactionと通信を行うための、Formコンポネントや多数のヘルパーを備えている
 
-特に **useTransition** はフォームのsubmitの状態(待機・サブミット・ロード)を管理したり、サブミット中のデータを取り扱うことが可能。
-
-これにより楽観的UIの構築も用意になる。
+特に **useTransition** はフォームのsubmitの状態  
+(idle / submitting / loading)を管理したり  
+submit中のデータを取り扱うことが可能なので、楽観的UIの実装も容易
 
 </div>
 <div class="flex-1">
@@ -653,73 +699,180 @@ logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 
 ---
 
-remix-validated-form
+<div class="flex space-x-4">
 
----
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
+<div class="flex-1">
+
+```tsx
+import { ValidatedForm } from "remix-validated-form";
+import { withZod } from "@remix-validated-form/with-zod";
+
+export const validator = withZod(
+  // your zod role
+);
+
+export const action = async ({ request }) => {
+  const result = await validator.validate(await request.formData());
+  if (result.error) return validationError(result.error);
+
+  const { firstName, lastName, email } = result.data;
+  // Do something with the data
+};
+
+export default function MyPage() {
+  return (
+    <ValidatedForm validator={validator} method="post">
+      <FormInput name="firstName" label="First Name" />
+      <FormInput name="lastName" label="Last Name" />
+      <FormInput name="email" label="Email" />
+      <SubmitButton />
+    </ValidatedForm>
+  );
+}
+```
+
+</div>
+<div class="flex-1">
+
+## remix-validated-form
+https://www.remix-validated-form.io/
+
+<br>
+
+remix-validated-formとzodを使用するとactionとコンポネントを一体化できる
+
+クライアントとサーバとでバリデーションを共通化できるだけでなく  
+エラーメッセージの返却・レンダリング、例外処理の実装から開放される
+
+別のデータソースと通信して別途バリデーションするなど、サーバサイドオンリーなバリデーションもかんたんに追加可能
+
+</div>
+</div>
+
 ---
 
 #### Remixの特徴 ⑤
 
+<br>
+
 # Cookieヘルパー
 
-CookieやSessionを取り扱うためのヘルパーが標準装備
+CookieやSessionを取り扱うためのヘルパーが標準装備  
 
-```ts
-import { createCookieSessionStorage } from "@remix-run/node"; // or "@remix-run/cloudflare"
+シリアライズ&検証の機能もデフォルトで実装されている
 
-const { getSession, commitSession, destroySession } =
-  createCookieSessionStorage({
-    // a Cookie from `createCookie` or the CookieOptions to create one
-    cookie: {
-      name: "__session",
+loader/actionと組み合わせることでこれまでフロントに実装していた、  
+ステート管理や認証などをサーバサイドへ移譲できる
 
-      // all of these are optional
-      domain: "remix.run",
-      expires: new Date(Date.now() + 60_000),
-      httpOnly: true,
-      maxAge: 60,
-      path: "/",
-      sameSite: "lax",
-      secrets: ["s3cret1"],
-      secure: true,
-    },
+ロジックがフロントに露出しないため、  
+秘匿性の高い情報の漏洩防止や、バンドルサイズの軽減につながる
+
+---
+
+<div class="flex space-x-4">
+<div class="flex-1">
+
+```tsx
+export const loader = async ({ request }) =>
+  supabaseStrategy.checkSession(request, {
+    successRedirect: '/private'
   });
 
-export { getSession, commitSession, destroySession };
+export const action = async ({ request }) =>
+  authenticator.authenticate('sb', request, {
+    successRedirect: '/private',
+    failureRedirect: '/login'
+  });
+
+export default function LoginPage() {
+  return (
+    <Form method="post">
+      <input type="email" name="email" />
+      <input type="password" name="password" />
+      <button>Sign In</button>
+    </Form>
+  );
+}
 ```
 
-loader/actionと組み合わせることでステート管理をサーバ側へ移譲することができる。
+</div>
+<div class="flex-1">
 
-ロジックがフロントに露出しないため、バンドルサイズも削減できる。
+## remix-auth  
+https://github.com/sergiodxa/remix-auth  
+(サンプルコードは[remix-auth-supabase](https://github.com/mitchelvanbever/remix-auth-supabase))
 
-例えば Supabase と組み合わせれば、クライアント側に認証ロジックやデータを一切持たないということも可能。
+認証方法・認可ルール・フォールバックルールなどを簡単に設定・制御できる
 
----
+クライアント側には一切ロジックが露出しない
 
-remix-auth
-
----
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
----
-
-# 使ってみて良かったところ
-
-- ステート管理ライブラリが不要になりクライアントコードが小さくなる
-  - さらにきめ細かく再フェッチできるので、低コストで情報更新できる
+</div>
+</div>
 
 ---
 
-# 使ってみて良かったところ
-- エッジレンダリングはたしかに早い
-  - KV使わなくても、200-300msで応答できる
-  - KV使えば100ms切る
-  - 同一構成の Next.js on Vercel のSSRで300-500ms
-  - (もちろんデータソースに起因する)
+<div class="flex space-x-4">
+<div class="flex-1">
+
+# 実際実用に耐えられるの？
+
+</div>
+
+<div class="flex-1">
+
+<div class="text-5xl">🤔</div>
+
+
+</div>
+</div>
+
+<br>
+
 
 ---
 
-# 使ってみて悪かったところ(苦しかったところ)
+<div class="flex space-x-4">
+<div class="flex-1">
+
+## <Tweet id="1529131553481453569"/>
+
+</div>
+
+<div class="flex-1">
+
+![](https://camo.qiitausercontent.com/bf17791a3291dfe19a39cb25a72449b8e70cea48/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e61702d6e6f727468656173742d312e616d617a6f6e6177732e636f6d2f302f37303336332f35323734633438342d666563342d316137352d313164632d3361313365646637626335632e706e67)
+
+<img src="/leaderboard.png" class="h-60" />
+
+</div>
+</div>
+
+---
+
+# 良かったところ
+
+- ステート管理ライブラリが不要
+  - 前述の通り
+- 認証ロジック・データフェッチロジックすべてがサーバサイド簡潔
+  - クライアントの実装はデータの描画のみに集中できる
+- 情報更新をきめ細かくリアルタイムに、かつ高速に
+  - 前述の例ではSupabaseのsubscribeと組み合わせて、DBに変更が加わったらスタッツを再フェチする
+  - ネストされた部分的なレイアウトのみ再フェッチ(フルページロードしない)
+  - 実際のデータフェッチはloader側で行うので、ロジックは一切露出しない
+
+---
+
+- エッジレンダリング(Cloudflare Workers)による恩恵
+  - ゼロコールドスタート
+    - KV使わなくても、200-300msで応答できる(TTFB)
+    - KV使えばSSRで100ms切る
+    - 同一構成の Next.js on Vercel のSSRで300-500ms
+    - もちろんデータソースに引っ張られるが
+  - スケールを気にしなくて良い
+
+---
+
+# 苦しみ
 
 - Nested Routeは想像以上に難易度が高い
   - URL設計とディレクトリ設計をセットで行わなければならない
@@ -729,29 +882,19 @@ logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
 
 ---
 
-
-# 使ってみて悪かったところ(苦しかったところ)
-
-- Github上のレスポンスやPR解決までのライフサイクルが長い
-  - 私がRemixのメンバーに言われた名言(皮肉)
-    - 「PRを起票するにはそれなりの根気強さと我慢が必要です」
-    - 「おすすめはできないけど、実際は patch-package が一番の解決策です」
-  - 一緒にリポジトリを育てるという気概が必要
-
----
-
-# 使ってみて悪かったところ(苦しかったところ)
-
-Workersに限った話になるが
+Workersに限った話になるが。。。
   
 - UIライブラリ入れると1MBにバンドルサイズを抑えるのは結構きつい
-  - SSRなので全てバンドルしないといけない(チャンクできない)
+  - SSRなので全てバンドルしないといけない(チャンクもできない)
   - Service Bindingsを駆使して回避した
 - まだまだWorker非対応なライブラリが多い
   - esbuildでpolyfillしたり、injectしたりなど職人芸が求められる
-  - しかし、そもそもesbuildの拡張が不可能
-    - 何度もDiscussionに起票されているが、コミュニティのポリシー的にNG
-  - 自分でRemixのesbuild を拡張可能にするライブラリを書いた
+  - しかし、そもそもRemixのコンパイラ(esbuild)の設定の拡張が不可能
+    - next.config.jsからwebpackの設定をいじるみたいな感じのことはできない 
+    - 拡張自体がコミュニティのポリシー的にNG (マネジメントコストとリスクの問題)
+      - 何度もDiscussionやPRは起票されているがことごとくリジェクト
+  - 最終的に自分でRemixのesbuild を拡張可能にするプラグインを書いた
+    - https://github.com/aiji42/remix-esbuild-override
 
 <br>
 
@@ -759,20 +902,122 @@ Workersに限った話になるが
 
 ---
 
-# 向いているサービスやサイト
+- コミュニティの問題
+  - issueやPRは活発に起票されるが、マージにめちゃくちゃ待たされる
+    - bug fix でも数ヶ月待たされるのがざら
+  - 献身的な姿勢と我慢強さが求められる
+    - Remixの開発メンバーからも「PRのマージに必要なのは我慢強さと根気だ」と言われたw
+    - 「おすすめはしないけど、正直現状はpatch-packageが一番有効な策だ」とも
+  - React Routerと同じチームが開発しているので。。。というだけで分かる人もいるはず
+
+---
+
+# 相性の良いサービスやサイト
+
+下記ケースならNext.jsで実装するよりもRemixで実装したほうが開発コストは小さくなる(と個人的には思う)
 
 - React Routeで構築されたSPAサイトをSSRに移行したい、SEO対策したい
   - React Routeの思想をベースに構築されているため、大きく構造を変えずに移行できる
-- 複数ページに渡るエントリーフォームを実装したい
-  - 後述のremix-validate-formを導入するとサーバ - クライアント間でバリデーションを共有できる
-  - 状態管理をloader/actionに任せられるので、ステートライブラリを入れなくてもよい
+
+- 複数ページに渡るエントリーフォームを簡単に実装したい
+  - 前述の通り、remix-validated-formとzodで簡単に作れる
+  - ステートライブラリも不要
+  - MVCなWebフレームワーク(Rails)使ってた人は比較的とっつきやすい(と個人的には思う)
+
 - 管理画面やダッシュボードをフルスクラッチしたい
   - React Adminの導入を試みたが、適したアダプターがなかったなど
+  - Nested Routes と remix-validated-form, remix-auth を駆使する
+  - loader/actionを各フォームやデータフィードと1対1で配置し、UIとデータロジックをそれぞれで凝縮
+    - テスタビリティの向上にもつながる
 
 ---
-logoHeader: 'https://blog.stackblitz.com/img/quotes/logo-remix.svg'
+
+# まとめ
+
+<br>
+
+最後は若干愚痴ぽくなってしまいましたが、なんと言っても  
+
+- Cloudflare Workerで動く
+
+- Nested routesの先駆け
+  - レイアウトとデータフェッチロジックの分散管理
+  - Next.jsに影響を及ぼす程の先見性
+
+<br>
+
+この2つを備えていて、ここまで完成度の高いフレームワークは他にはありません。  
+なので、十分に試す価値はあると思います。
+
+また、Next.jsの新しいLayout戦略がGAされるまでの素振りとしても良いと思います。
+
 ---
 
-# Next.jsにもなにかエッセンス取り入れられませんか？
+# One more thing
 
-next-runtime
+## Next.jsにRemixのエッセンスを取り入れる
+
+---
+
+<div class="flex space-x-4">
+<div class="flex-1">
+
+```tsx
+import { handle, json, Form, useFormSubmit } from 'next-runtime';
+
+export const getServerSideProps = handle({
+  async get() {
+    return json({ name: 'smeijer' });
+  },
+  async post({ req: { body } }) {
+    await db.comments.insert(body);
+
+    return json({ message: 'thanks for your comment!' });
+  },
+});
+
+export default function MyPage({ name, message }) {
+  const { isSubmitting } = useFormSubmit();
+
+  if (message) return <p>{message}</p>;
+  return (
+    <Form method="post">
+      <input name="name" defaultValue={name} />
+      <input name="message" />
+      <button type="submit" disabled={pending}>
+        {isSubmitting ? 'submitting' : 'submit'}
+      </button>
+    </Form>
+  );
+}
+```
+
+</div>
+
+<div class="flex-1">
+
+## next-runtime
+https://next-runtime.meijer.ws/getting-started/1-introduction
+
+<img src="https://github.com/smeijer/next-runtime/raw/main/docs/public/banner.png" class="h-20" />
+
+<br>
+
+getServerSidePropsを拡張し、リクエストメソッドごとに実装を書き分けることができる  
+フォームのアクションをapi routesにせず、自パスに向ければ、擬似的なloader/actionになる
+
+楽観的UIのためのヘルパーやCookieを取り扱うヘルパーなどが用意されており、かなりRemixに似ている
+
+<small>というか、Remixをインスパイアされて実装したと作者がドキュメントで明言している</small>
+
+
+</div>
+</div>
+
+---
+
+こちらの記事でも紹介しています
+
+<img src="/og-base_z4sxah.png" class="h-70 bg-white" />
+
+https://zenn.dev/aiji42/articles/23a88a7b111694
