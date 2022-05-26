@@ -40,11 +40,36 @@ image: 'https://remix.run/remix-v1.jpg'
 
 ---
 
+## この発表をぜひ聞いて欲しい人
+
+- Remixって最近良く聞いたり目にしたりするなー 🤔
+
+- Next.js大好き！正直コレ一本で食っていけるよね 😎
+  - この発表を聞くと、たとえRemixを使用しなくても実装の仕方の幅が広がることでしょう
+
+- 最近Next.jsがなんか新しいLayoutに関するRF公開したよね
+  - そうです、かなりRemixにインスパイアされています
+
+- Cloudflareってなんか最近勢いあるよね、なんか試してみようかな 🌩
+  - Remixを語る上で切り離せない話題です
+
+---
+
+## その前にお断り
+
+この発表ではJamstackもCMSにも触れません 🙇‍
+
+しかし、Remixが解決しようとしていることは、今後のReactやフロント界隈の方向性に  
+少なからず影響を与えていると私は考えています。
+
+---
+
 # What is Remix ?
 
 - React SSRフレームワーク
 - React Routerの開発チームが開発を主導
 - 昨年11月末にv1がリリースされたタイミングでパブリックに
+- Cloudflare Workersで稼働させられたり、Denoをサポートしていたり
 - 📀 のアイコンがよく使われる
 
 ---
@@ -647,28 +672,43 @@ li {
 
 ---
 
-<style>
-p {
-  font-size: large;
-}
-</style>
-
-プラットフォームに依存しないという点で、Next.jsとVercelの関係と比較される事が多い
-
-ただし、RemixはSSRだけしかサポートしていないので単純比較は正直フェアではない  
-(Next.jsもSSRだけならプラットフォームには依存しないので)
-
-<br>
-
 ## Remixの一番の強みは Cloudflare Workers 上で動くという点
 
 だと個人的には思う。
 
-低コスト・例レイテンシでリアルタイムにコンテンツをデリバリできるのが強み
+**エッジロケーションでレンダリングできるというのは今後のReact界隈において重要な意味をもつ**
+
+---
+
+## Reactが向かう先 - Server component / Streaming render
+
+<style>
+li {
+  font-size: medium;
+}
+</style>
+
+- コンポネントのレンダリングをServerサイドで行うようになる
+  - 従来のSSRとはことなり、コンポネントの粒度で解決し、さらにストリームで返却する
+  - <small>src: https://mxstbr.com/thoughts/streaming-ssr/</small> <img src="https://mxstbr.com/static/images/renderToString.png" class="h-60 bg-white" />
+  - 各コンポネントでデータフェッチの処理を持ち、非同期的・自律的に解決する
+
+- 同時接続数は爆発的に増加し、そしてラウンドトリップによるレイテンシが無視できなくなることが予想できる
+
+---
+
+## そんな未来を見据えると
+
+- エッジファンクション(ロケーション)がオリジンとして機能する
+- スケールあまり意識しなくて良い
+- 1リクエストあたりのコストが安価
+
+という点は大きなアドバンテージになる
 
 <br>
 
-**裏を返せば静的なページをデリバリするのであれば Remix は向いていない**
+#### Next.jsも昨年のエッジファンクション(middleware)の発表を皮切りに、エッジレンダリングを模索している  
+[RFC: Switchable Next.js Runtime #34179](https://github.com/vercel/next.js/discussions/34179)
 
 ---
 
@@ -814,7 +854,7 @@ https://github.com/sergiodxa/remix-auth
 <div class="flex space-x-4">
 <div class="flex-1">
 
-# 実際実用に耐えられるの？
+# 実用に耐えられるの？
 
 </div>
 
@@ -849,11 +889,11 @@ https://github.com/sergiodxa/remix-auth
 
 ---
 
-# 良かったところ
+# 実際に得られた恩恵
 
 - ステート管理ライブラリが不要
   - 前述の通り
-- 認証ロジック・データフェッチロジックすべてがサーバサイド簡潔
+- 認証ロジック・データフェッチロジックすべてがサーバサイド完結
   - クライアントの実装はデータの描画のみに集中できる
 - 情報更新をきめ細かくリアルタイムに、かつ高速に
   - 前述の例ではSupabaseのsubscribeと組み合わせて、DBに変更が加わったらスタッツを再フェチする
@@ -895,10 +935,6 @@ Workersに限った話になるが。。。
       - 何度もDiscussionやPRは起票されているがことごとくリジェクト
   - 最終的に自分でRemixのesbuild を拡張可能にするプラグインを書いた
     - https://github.com/aiji42/remix-esbuild-override
-
-<br>
-
-**初心者の方はランタイムNodeからスタートすることをオススメします**
 
 ---
 
