@@ -7,8 +7,7 @@ layout: center
 
 <div class="text-center text-5xl pb-8">📀</div>
 
-## パブリックから半年
-# Remix使い倒してみた
+# Remixの凄みを紹介したい
 
 ## @aiji42_dev
 
@@ -19,7 +18,7 @@ introImage: 'https://storage.googleapis.com/zenn-user-upload/avatar/e738d28d01.j
 
 # Who am I ?
 
-## Uejima Aiji | @aiji42_dev
+## Uejima Aiji | Twitter: @aiji42_dev
 
 <br>
 
@@ -37,6 +36,8 @@ image: 'https://remix.run/remix-v1.jpg'
 ---
 
 # 今日はRemixを紹介したい
+
+パブリックされてから半年間、個人でも社内でもRemixを使い倒したので
 
 ---
 
