@@ -58,7 +58,7 @@ image: 'https://remix.run/remix-v1.jpg'
 
 ## その前にお断り
 
-この発表ではJamstackもCMSにも触れません 🙇‍
+この発表ではJamstackにもCMSにも触れません 🙇‍
 
 しかし、Remixが解決しようとしていることは、  
 今後のReactやフロント界隈の方向性に少なからず影響を与えており、  
@@ -615,7 +615,7 @@ export function ErrorBoundary({ error }) {
 
 ## Nested Routes があると何が嬉しいか
 
-- レイアウトのグルーピングと階層適応
+- レイアウトのグルーピングと階層的な適応
 
 - 並列データフェッチ
   - 各loaderは並列に処理されるため、高速化につながる
@@ -627,7 +627,7 @@ export function ErrorBoundary({ error }) {
   - 特定ルート配下はログイン必須にするなどの、共通処理を階層的にもたせられる
   - pathless routesと組み合わせて特定のディレクトリ下は暗黙的に認証必須にするなど
  
-- 差分ロード・差分再フェッチ
+- 差分ロード・再フェッチ
   - ナビゲーション時にフルページロードではなく、必要なレイアウトルート分のロードが行われる
   - 任意にページ内を更新する再フェッチ処理も実装しやすい
 
@@ -640,8 +640,8 @@ https://nextjs.org/blog/layouts-rfc
 
 - 現プロポーザルではおおよそRemixと同等の機能をカバーする予定
   - pathlessやErrorBoundaryに関しても、ドキュメントにはないが「パート2で言及する」とのこと
-    - かなりRemixのノウハウが意思決定に影響を及ぼしている印象
-  - デフォルトでServerComponentになる (Remixでも同様に議論は起きている)
+    - かなりRemixのノウハウが意思決定に影響を与えている印象
+  - デフォルトでServer Componentになる (Remixでも同様に議論されており近い将来デフォルトになるはず)
 
 ---
 layout: cover-logos
@@ -706,6 +706,8 @@ li {
 - 1リクエストあたりのコストが安価
 
 という点は大きなアドバンテージになる
+
+## だからCloudflare Workers上で動くというのは大きな意味を持つ
 
 <br>
 
@@ -910,8 +912,8 @@ https://github.com/sergiodxa/remix-auth
 - エッジレンダリング(Cloudflare Workers)による恩恵
   - ゼロコールドスタート
     - KV使わなくても、200-300msで応答できる(TTFB)
-    - KV使えばSSRで100ms切る
-    - 同一構成の Next.js on Vercel のSSRで300-500ms
+      - 同一構成の Next.js on Vercel のSSRで300-500ms
+    - KV使えばSSRで60-80ms
     - もちろんデータソースに引っ張られるが
   - スケールを気にしなくて良い
 
